@@ -3,7 +3,10 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 
-# Include the calculator directly to avoid import issues
+# Import the data proxy
+from src.uk_market_data_proxy import UKMarketDataProxy
+
+# Keep the ConstraintStabilityCalculator class
 class ConstraintStabilityCalculator:
     def __init__(self, locations):
         self.locations = locations
@@ -32,8 +35,12 @@ class ConstraintStabilityCalculator:
         }
 
 class HierarchicalBatteryEnv(gym.Env):
-    def __init__(self, battery_locations=['SCOTLAND', 'LONDON']):
+    def __init__(self, battery_locations=['SCOTLAND', 'LONDON'], use_calibrated_data=True):
         super().__init__()
+        
+        # Initialize market data proxy
+        self.data_proxy = UKMarketDataProxy() if use_calibrated_data else None
+        self.use_calibrated_data = use_calibrated_data
         
         # Initialize stability calculator
         self.stability_calc = ConstraintStabilityCalculator(battery_locations)
@@ -46,66 +53,57 @@ class HierarchicalBatteryEnv(gym.Env):
         # State space: [hour, price, soc_battery1, soc_battery2, grid_stress]
         self.observation_space = spaces.Box(low=0, high=1, shape=(5,), dtype=np.float32)
         
-        # Initialize state variables
-        self.hour = 0
-        self.soc = [0.5, 0.5]
-        self.commander_target = [0.5, 0.5]
-        self.total_reward = 0
-        self.economic_reward = 0
-        self.stability_reward = 0
+        self.reset()
     
     def reset(self, seed=None, options=None):
-        # Initialize the random number generator
         super().reset(seed=seed)
-        
-        # Reset state
         self.hour = 0
         self.soc = [0.5, 0.5]
         self.commander_target = [0.5, 0.5]
         self.total_reward = 0
         self.economic_reward = 0
         self.stability_reward = 0
-        
-        observation = self._get_obs()
-        info = {}
-        return observation, info
+        return self._get_obs(), {}
     
     def _get_obs(self):
-        # Mock data
-        price = self._get_mock_price()
+        price = self._get_price()
         grid_stress = 0.8 if self.hour in [18, 19, 20] else 0.2
         
         return np.array([
-            self.hour / 24,           # Normalized hour (0-1)
-            price / 100,              # Normalized price (0-1)
-            self.soc[0],              # SOC battery 1 (0-1)
-            self.soc[1],              # SOC battery 2 (0-1)  
-            grid_stress               # Grid stress level (0-1)
+            self.hour / 24,
+            price / 200,  # Normalize to £200/MWh max
+            self.soc[0],
+            self.soc[1], 
+            grid_stress
         ], dtype=np.float32)
     
+    def _get_price(self):
+        """Get price - uses calibrated data if available, otherwise mock"""
+        if self.use_calibrated_data and self.data_proxy:
+            return self.data_proxy.get_price_for_hour(self.hour)
+        else:
+            return self._get_mock_price()
+    
     def _get_mock_price(self):
-        # Simple diurnal price pattern
-        if 6 <= self.hour < 16:       # Day
+        """Fallback mock prices (original implementation)"""
+        if 6 <= self.hour < 16:
             return 45 + np.random.normal(0, 5)
-        elif 16 <= self.hour < 22:    # Peak
+        elif 16 <= self.hour < 22:
             return 85 + np.random.normal(0, 15)
-        else:                         # Night
+        else:
             return 35 + np.random.normal(0, 3)
     
     def step(self, action):
-        """
-        Execute one time step in the environment
-        """
-        # Denormalize actions to MW (-10 to +10 MW)
+        # Denormalize actions to MW
         power_dispatch = action * 10
         
-        # Calculate economic reward (simple arbitrage)
-        price = self._get_mock_price()
+        # Calculate economic reward using calibrated prices
+        price = self._get_price()
         economic_reward = 0
         for i in range(self.num_batteries):
-            economic_reward -= power_dispatch[i] * price * 0.5  # £ for 30-min dispatch
+            economic_reward -= power_dispatch[i] * price * 0.5  # £ for 30-min
         
-        # Calculate stability rewards
+        # Calculate stability rewards using our calculator
         grid_conditions = {
             'hour': self.hour,
             'frequency': 49.8 if self.hour in [18, 19] else 50.0,
@@ -123,25 +121,23 @@ class HierarchicalBatteryEnv(gym.Env):
         stability_weight = 0.01
         weighted_stability = stability_rewards * stability_weight
         
-        # Update SOC (simplified physics)
+        # Update SOC (simplified)
         for i in range(self.num_batteries):
             self.soc[i] += power_dispatch[i] * 0.05  # 10 MW * 0.5h = 5 MWh
             self.soc[i] = np.clip(self.soc[i], 0, 1)
         
         # Calculate plan deviation penalty
-        plan_deviation_penalty = -10 * sum(abs(self.soc[i] - self.commander_target[i]) 
-                                         for i in range(self.num_batteries))
+        plan_deviation_penalty = -10 * sum(abs(self.soc[i] - self.commander_target[i]) for i in range(self.num_batteries))
         
-        # Total reward with balanced weights
+        # Total reward combines all components with balanced weights
         total_reward = economic_reward + weighted_stability + plan_deviation_penalty
         
-        # Update episode totals
+        # Update state
         self.hour += 1
         self.total_reward += total_reward
         self.economic_reward += economic_reward
         self.stability_reward += stability_rewards
         
-        # Check if episode is done
         done = self.hour >= 24
         
         info = {
@@ -150,10 +146,24 @@ class HierarchicalBatteryEnv(gym.Env):
             'weighted_stability': weighted_stability,
             'plan_deviation': plan_deviation_penalty,
             'soc': self.soc.copy(),
-            'battery_locations': self.battery_locations
+            'battery_locations': self.battery_locations,
+            'price': price,  # Add price to info for analysis
+            'data_source': 'CALIBRATED_UK_MARKET' if self.use_calibrated_data else 'SYNTHETIC'
         }
         
         return self._get_obs(), total_reward, done, False, info
+    
+    def get_calibration_report(self):
+        """Report on data calibration for thesis"""
+        if self.use_calibrated_data and self.data_proxy:
+            return {
+                'data_source': 'UK Market Data Proxy - Calibrated to Public Reports',
+                'calibration_references': self.data_proxy.calibration_sources,
+                'real_data_integration_ready': True,
+                'compatible_apis': self.data_proxy.get_data_readiness_report()['compatible_apis'],
+                'calibration_validation': self.data_proxy.validate_calibration()
+            }
+        return {'data_source': 'Synthetic data for development'}
     
     def set_commander_target(self, target_soc):
         """Set the commander's SOC targets for both batteries"""
@@ -161,8 +171,7 @@ class HierarchicalBatteryEnv(gym.Env):
     
     def render(self):
         """Simple text rendering"""
-        print(f"Hour: {self.hour}, SOC: {[f'{s:.2f}' for s in self.soc]}, "
-              f"Total Reward: {self.total_reward:.2f}")
+        print(f"Hour: {self.hour}, SOC: {[f'{s:.2f}' for s in self.soc]}, Total Reward: {self.total_reward:.2f}")
     
     def close(self):
         pass
