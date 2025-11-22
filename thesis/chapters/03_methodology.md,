@@ -1,0 +1,124 @@
+# CHAPTER 3: METHODOLOGY
+
+## 3.1 Hierarchical RL Architecture Design
+
+### Two-Level Decision Making
+Commander (Day-Ahead) → Tactician (Real-Time) → Settlement (Learning)
+
+**Commander Level**:
+- 24-hour planning horizon
+- SOC target trajectory optimization  
+- Expected value estimation
+- Strategy adaptation based on settlement feedback
+
+**Tactician Level**:
+- 30-minute execution intervals
+- Multi-objective real-time optimization
+- Stability constraint management
+- Commander plan deviation minimization
+
+## 3.2 Multi-Objective Reward Formulation
+
+### Reward Components
+`R_total = w1*R_economic + w2*R_stability + w3*R_plan_adherence`
+
+**Economic Reward (R_economic)**:
+- Balancing Mechanism revenue
+- Frequency response payments
+- BSUoS cost avoidance
+
+**Stability Reward (R_stability)**:
+- Congestion cost reduction (TEC-based)
+- Inertia provision (RoCoF penalty avoidance)
+- Voltage support
+
+**Plan Adherence Reward (R_plan_adherence)**:
+- SOC target trajectory following
+- Commander strategy implementation
+
+## 3.3 UK Market Data Integration Strategy
+
+### Data Proxy Architecture
+```python
+class UKMarketDataProxy:
+    def get_tec_rates():          # Transmission Entry Capacity
+    def get_bm_price_profile():   # Balancing Mechanism patterns  
+    def get_constraint_data():    # NG ESO constraint costs
+    def get_frequency_rates():    # FFR, Dynamic Containment
+
+Calibration Sources
+NG ESO Constraint Report: £1.8bn annual costs
+
+Elexon BMRS: B1770 BM price patterns
+
+National Grid TEC Register: Locational capacity rates
+
+NG ESO FFR Auctions: Frequency service prices
+
+3.4 Constraint Stability Calculator
+Congestion Cost Quantification
+Congestion_Cost = Power × TEC_Rate × Duration
+
+Inertia Value Assessment
+Inertia_Penalty = f(RoCoF, Frequency_Deviation)
+
+Implementation
+
+class ConstraintStabilityCalculator:
+    def calculate_congestion_cost()
+    def calculate_inertia_penalty() 
+    def calculate_stability_rewards()
+
+3.5 Settlement Engine & Learning Loop
+Learning Feedback Mechanism
+
+class SettlementEngine:
+    def record_episode()
+    def calculate_commander_feedback()
+    def update_strategy_weights()
+
+Strategy Adaptation
+Conservative vs aggressive dispatch
+
+Stability objective weighting
+
+Portfolio coordination parameters
+
+3.6 Experimental Validation Framework
+Performance Metrics
+Economic efficiency (£/day)
+
+Stability impact quantification
+
+Learning convergence
+
+Computational performance
+
+Comparison Baselines
+Single-objective optimization
+
+Flat RL architecture
+
+Rule-based strategies
+
+Industry benchmarks
+
+
+### **FILE 5: Create the Complete Thesis Structure**
+
+Now let's create the remaining chapter templates and organizational structure:
+
+```bash
+# Create the complete thesis folder structure
+mkdir -p thesis/{chapters,figures,code,tables,appendices}
+
+# Create all chapter files
+touch thesis/chapters/04_implementation.md
+touch thesis/chapters/05_results.md  
+touch thesis/chapters/06_discussion.md
+touch thesis/chapters/07_conclusion.md
+
+# Create supporting files
+touch thesis/abstract.md
+touch thesis/acknowledgements.md
+touch thesis/executive_summary.md

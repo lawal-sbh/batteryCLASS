@@ -1,0 +1,68 @@
+# CHAPTER 2: LITERATURE REVIEW
+
+## 2.1 Battery Energy Storage Systems in Modern Grids
+
+BESS deployment has grown exponentially, with global capacity reaching 28GW in 2023 (IEA, 2023). Key applications include:
+
+- **Energy arbitrage**: Capitalizing on price differentials (Zhou et al., 2021)
+- **Frequency response**: FFR, Dynamic Containment services (NG ESO, 2023)
+- **Congestion management**: Constraint cost reduction (Pudjianto et al., 2022)
+- **Inertia emulation**: Synthetic inertia provision (Yazdani et al., 2023)
+
+## 2.2 UK Electricity Market Structure
+
+The UK operates one of the world's most complex electricity markets:
+
+### Balancing Mechanism (BM)
+- Real-time balancing with 30-minute settlement periods
+- £4.2bn market volume annually (Elexon, 2023)
+- Price spikes exceeding £4,000/MWh during constraints
+
+### Ancillary Services
+- **Frequency Response**: FFR, Dynamic Containment, Moderation
+- **Balancing Services**: STOR, Fast Reserve
+- **Constraint Management**: £1.8bn annual costs (NG ESO, 2023)
+
+### Network Charges
+- **BSUoS**: Balancing System Use of System charges
+- **TEC**: Transmission Entry Capacity rates
+- **Locational pricing**: Significant regional variations
+
+## 2.3 Reinforcement Learning in Energy Applications
+
+RL has emerged as a powerful approach for energy system optimization:
+
+- **Single-agent RL**: Price forecasting and arbitrage (Chen et al., 2022)
+- **Multi-agent RL**: Coordinated storage dispatch (Zhang et al., 2023)
+- **Deep RL**: Complex policy learning in high-dimensional spaces (Wang et al., 2023)
+
+**Research Gap**: Limited application of hierarchical RL for multi-timescale battery dispatch.
+
+## 2.4 Multi-Objective Optimization in Power Systems
+
+Multi-objective approaches balance competing objectives:
+
+- **Weighted sum methods**: Simple but limited (Kim & Powell, 2021)
+- **Pareto optimization**: Multiple optimal solutions (Li et al., 2022)
+- **Constraint method**: Convert objectives to constraints (Zhou et al., 2023)
+
+**Research Gap**: Inadequate treatment of public grid services as optimization objectives.
+
+## 2.5 Hierarchical Control Architectures
+
+Hierarchical control decomposes complex problems:
+
+- **Two-level optimization**: Day-ahead scheduling with real-time adjustments (Zhou et al., 2022)
+- **Model Predictive Control**: Receding horizon optimization (Morari et al., 2023)
+- **Multi-agent systems**: Distributed decision making (Zhang et al., 2023)
+
+**Research Gap**: Limited integration of hierarchical control with RL for battery dispatch.
+
+## 2.6 Research Gap Identification
+
+This thesis addresses three critical gaps:
+
+1. **Temporal coordination**: Integrated day-ahead and real-time decision making
+2. **Public-private balance**: Simultaneous optimization of economic and stability objectives  
+3. **UK market specificity**: Tailored solutions for complex UK market structure
+4. **Portfolio coordination**: Multi-location battery optimization

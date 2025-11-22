@@ -1,0 +1,26 @@
+UK Battery Dispatch Dataset Information
+==================================================
+
+Generated: 2025-11-22 16:10:19.625114
+Total Rows: 49,679
+Date Range: 2023-01-01 00:30:00 to 2025-10-31 23:30:00
+Total Days: 1,035
+
+Columns:
+   1. datetime
+   2. SETTLEMENT_DATE
+   3. SETTLEMENT_PERIOD
+   4. TSD
+   5. ND
+   6. EMBEDDED_WIND_GENERATION
+   7. EMBEDDED_SOLAR_GENERATION
+   8. system_price
+   9. hour
+  10. minute
+  11. day_of_week
+  12. month
+  13. day_of_year
+  14. is_weekend
+  15. is_peak
+  16. demand_change
+  17. price_change
