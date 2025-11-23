@@ -1,31 +1,53 @@
 # Python
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+env/
+venv/
+.venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data (large files)
+*.csv
+!data/training/normalization_params.json
+data/raw/
+*.xlsx
+
+# Models (large checkpoints)
+models/*/*.pth
+!models/commander/best_model.pth
+!models/tactician/best_model.pth
+models_retrained/*/commander_episode_*.pth
+models_retrained/*/tactician_episode_*.pth
+!models_retrained/*/best_*.pth
+
+# Results (except summaries)
+results/*.csv
+results/figures/*.png
+!results/metrics_*.json
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+*.tmp
