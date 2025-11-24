@@ -1,0 +1,11 @@
+{
+  "method": "rule_based_optimized",
+  "total_reward": 162.29021113259589,
+  "total_revenue": -140.01237653405735,
+  "avg_reward_per_day": 0.3151266235584386,
+  "avg_revenue_per_day": -0.2718686922991405,
+  "violation_rate": 0.0,
+  "num_days": 515,
+  "num_violations": 0,
+  "avg_soc": 0.6575478482530139
+}

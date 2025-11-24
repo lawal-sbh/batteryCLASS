@@ -1,0 +1,9 @@
+{
+  "method": "sac_single_battery",
+  "total_reward": -3099.1280579204263,
+  "avg_reward_per_day": -6.017724384311507,
+  "total_revenue": -4168.300253648972,
+  "violation_rate": 0.0,
+  "num_days": 515,
+  "avg_soc": 0.4379989953020803
+}
